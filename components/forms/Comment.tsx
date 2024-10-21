@@ -8,12 +8,9 @@ import { z } from "zod"
 import { Input } from "../ui/input";
 import { usePathname, useRouter } from "next/navigation";
 
-//import { updateUser } from "@/lib/actions/user.actions";
 import { CommentValidation } from "@/lib/validations/Thread";
 import Image from "next/image";
 import { addCommentToThread } from "@/lib/actions/thread.actions";
-import { currentUser } from "@clerk/nextjs/server";
-//import { createThread } from "@/lib/actions/thread.action";
 
 interface Props {
     threadId: string,
