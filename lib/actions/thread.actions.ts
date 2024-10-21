@@ -57,7 +57,6 @@ interface Params {
 
 export async function createThread({ text, author, communityId, path }: Params
 ) {
-  console.log("communityId:", communityId)
   try {
     connectTDB();
 
@@ -65,7 +64,6 @@ export async function createThread({ text, author, communityId, path }: Params
       { id: communityId },
       { _id: 1 }
     );
-    console.log("communityIdObject:", communityIdObject);
 
     const createdThread = await Thread.create({
       text,
