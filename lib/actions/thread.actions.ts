@@ -238,3 +238,71 @@ export async function addCommentToThread(
     throw new Error("Unable to add comment");
   }
 }
+
+
+export async function likeThread(threadId: string, userId: string, path: string ) {
+  await connectTDB();
+
+  try {
+    // Find the original thread by its ID
+    const thread = await Thread.findById(threadId);
+    
+    if (!thread) {
+      throw new Error("Thread not found");
+    }
+
+    // Check if the user already liked the thread
+    if (thread.likes && thread.likes.includes(userId)) {
+      throw new Error("You have already liked this thread");
+    }
+
+    // Add the user ID to the likes array
+    thread.likes = thread.likes ? [...thread.likes, userId] : [userId];
+
+    // Save the updated thread
+    await thread.save();
+
+    // Revalidate the path
+    revalidatePath(path);
+
+    return thread; // Return the updated thread
+  } catch (err) {
+    console.error("Error while liking thread:", err);
+    throw new Error("Unable to like thread");
+  }
+}
+
+export async function repostThread(threadId: string, userId: string, path: string ) {
+  await connectTDB();
+
+  try {
+    // Find the original thread by its ID
+    const originalThread = await Thread.findById(threadId);
+    
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+
+    // Create the new repost thread
+    const repostedThread = new Thread({
+      text: originalThread.text,
+      author: userId, // Set the user ID of the person reposting
+      community: originalThread.community,
+      parentId: originalThread.id, // Link to the original thread
+      createdAt: new Date(),
+    });
+
+    // Save the reposted thread to the database
+    const savedRepostedThread = await repostedThread.save();
+
+    // Optionally, you can update the original thread if needed (e.g., increment repost count)
+
+    // Revalidate the path
+    revalidatePath(path);
+
+    return savedRepostedThread;
+  } catch (err) {
+    console.error("Error while reposting thread:", err);
+    throw new Error("Unable to repost thread");
+  }
+}
